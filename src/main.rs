@@ -104,7 +104,10 @@ struct Args {
 }
 
 fn run_day_01(){
-    println!("Day 01 is not implented yet");
+    let values = fs::read_to_string("data/day_01.txt")
+        .expect("Day 01 data not initialized");
+    let result = solutions::day_01::run(&values);
+    println!("Result: {}", result);
 }
 fn run_day_02(){
     println!("Day 02 is not implented yet");
