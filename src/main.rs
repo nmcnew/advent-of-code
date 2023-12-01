@@ -106,8 +106,9 @@ struct Args {
 fn run_day_01(){
     let values = fs::read_to_string("data/day_01.txt")
         .expect("Day 01 data not initialized");
-    let result = solutions::day_01::run(&values);
-    println!("Result: {}", result);
+    let result = solutions::day_01::part1(&values);
+    let result2 = solutions::day_01::part2(&values);
+    println!("Part 1: {result}, Part 2: {result2}");
 }
 fn run_day_02(){
     println!("Day 02 is not implented yet");

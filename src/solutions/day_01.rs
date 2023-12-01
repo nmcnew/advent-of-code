@@ -1,11 +1,15 @@
 use std::collections::HashMap;
-pub fn run(input: &String) -> i32 {
+pub fn part1(input: &String) -> i32 {
     // Part 1
     let part1: i32 = input.lines()
         .map(|line| line.chars().filter(|c| c.is_digit(10)).collect::<String>())
         .map(|number_string| [number_string.chars().nth(0).unwrap(),number_string.chars().nth(number_string.chars().count()-1).unwrap()].iter().collect::<String>())
-        .map(|configNumber| configNumber.parse::<i32>().unwrap())
+        .map(|config_number| config_number.parse::<i32>().unwrap())
         .sum();
+    return part1;
+}
+
+pub fn part2(input: &String) -> i32 {
     let number_map = HashMap::from([
         ("one", '1'),
         ("two", '2'),
@@ -15,7 +19,7 @@ pub fn run(input: &String) -> i32 {
         ("six", '6'),
         ("seven", '7'),
         ("eight", '8'),
-        ("nine", '9'),
+        ("nine", '9')
     ]);
     let part2 = input.lines()
         .map(|line| {
@@ -41,7 +45,7 @@ pub fn run(input: &String) -> i32 {
             return result;
         })
         .map(|number_string| [number_string.chars().nth(0).unwrap(),number_string.chars().nth(number_string.chars().count()-1).unwrap()].iter().collect::<String>())
-        .map(|configNumber| configNumber.parse::<i33>().unwrap())
+        .map(|config_number| config_number.parse::<i32>().unwrap())
         .sum();
     return part2;
 }
