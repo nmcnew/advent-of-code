@@ -87,12 +87,24 @@ pub fn part2(input: &String) -> i32 {
                     .collect::<Vec<_>>()
             })
             .collect::<Vec<_>>();
-
         return (game_id, pulls);
     })
-    .collect::<Vec<_>>()
-    .iter()
-    .map(|game| game.1.iter().fold(game.1.first(), |acc, x| ));
+    .map(|game| game.1.iter()
+            .map(|rounds| rounds.iter().fold((0, 0, 0), |acc, x| match x.1 {
+                "red" => (x.0, acc.1, acc.2),
+                "green" => (acc.0, x.0, acc.2),
+                "blue" => (acc.0, acc.1, x.0),
+                _ => panic!("what did you do...")
+                }))
+            .fold((0,0,0), |mut acc, x|{
+                if acc.0 < x.0 { acc.0 = x.0; }
+                if acc.1 < x.1 { acc.1 = x.1; }
+                if acc.2 < x.2 { acc.2 = x.2; }
+                acc 
+            })
+    )
+    .map(|min_blocks| min_blocks.0 * min_blocks.1 * min_blocks.2 )
+    .sum();
 
-    return 0;
+    return result;
 }
