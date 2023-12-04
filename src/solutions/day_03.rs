@@ -89,21 +89,39 @@ pub fn part2(input: &String) -> i32 {
             }
         }
     }
-    let numbers_gears = numbers.iter()
-    .map(|num| (num, gear_map.iter().filter(|(gear_x, gear_y)| *gear_x >= num.1-1 && *gear_x <= num.1+1 && *gear_y >= num.2-1 && *gear_y <= num.3+1).collect::<Vec<_>>()))
-    .filter(|ng| ng.1.len() == 1)
-    .map(|ng| (**ng.1.iter().next().unwrap(),*ng.0)).collect::<Vec<_>>();
+    let numbers_gears = numbers
+        .iter()
+        .map(|num| {
+            (
+                num,
+                gear_map
+                    .iter()
+                    .filter(|(gear_x, gear_y)| {
+                        *gear_x >= num.1 - 1
+                            && *gear_x <= num.1 + 1
+                            && *gear_y >= num.2 - 1
+                            && *gear_y <= num.3 + 1
+                    })
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .filter(|ng| ng.1.len() == 1)
+        .map(|ng| (**ng.1.iter().next().unwrap(), *ng.0))
+        .collect::<Vec<_>>();
 
     let mut result = 0;
     let numbers_gears2 = numbers_gears.clone();
     for ng in numbers_gears {
-        let adj = numbers_gears2.iter().filter(|ng2| ng2.0 == ng.0 && ng2.1 != ng.1).next();
+        let adj = numbers_gears2
+            .iter()
+            .filter(|ng2| ng2.0 == ng.0 && ng2.1 != ng.1)
+            .next();
         if adj.is_some() {
             let a = adj.expect("lol I already checked");
-            result += ng.1.0 * a.1.0;
+            result += ng.1 .0 * a.1 .0;
         }
     }
-    return result/2;
+    return result / 2;
 }
 
 fn build_schematic(input: &String) -> Vec<Vec<char>> {
