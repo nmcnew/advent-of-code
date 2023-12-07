@@ -59,6 +59,26 @@ pub fn part2(input: &String) -> u64 {
         }
     }
 
+    seeds.sort_by(|s1, s2| s1.0.cmp(&s2.0));
+    
+    //build Vec<Vec<u64>> where the seeds could start at
+
+    for i in 0..seeds.len() - 1{
+        if i == seeds.len()-1 {
+            break;
+        }
+        let mut seed1 = seeds[i];
+        let seed2 = seeds[i+1];
+
+        if seed1.0+seed1.1 > seed2.0 {
+            seed1.1 = seed1.0 + seed2.0 - seed1.0 - 1;
+        }
+    }
+    println!("{:?}", seeds);
+    for seed in seeds {
+        
+    }
+
     return 0;
 }
 
@@ -74,6 +94,7 @@ struct SeedRange {
     source: Range<u64>,
     destination: Range<u64>
 }
+
 impl SeedRange {
     fn new(src: u64, dest: u64, length: u64) -> SeedRange {
         return SeedRange {
@@ -82,22 +103,8 @@ impl SeedRange {
         };
     }
 }
-impl SeedMap {
-    fn get_dest_range(&self, src: (u64, u64)) -> Vec<Range<u64>> {
-        let possible_map = self
-            .ranges
-            .iter()
-            .filter(|c| src.0 < c.source.end && src.0+src.1 > c.source.start)
-            .map(|c| {
-                let mut start = src.0;
-                let mut end = src.0+src.1;
-                c.source.start + c.destination.start - src.0;
-                c.source.end + c.destination.end - (src.0 + src.1);
-            })
-            .collect::<Vec<_>>();
 
-        return Vec::new();
-    }
+impl SeedMap {
     fn get_dest(&self, src: u64) -> u64 {
         let possible_map = self
             .ranges
@@ -158,14 +165,7 @@ impl FromStr for SeedMap {
         })
     }
 }
-#[test]
-fn range_splitting() {
-    let expected = vec![Range {start: 0, end: 5}, Range{start: 21, end: 24}, Range{start: 10, end: 15}];
-    let seed_range = SeedRange::new(6,21,4);
-    let seed_map = SeedMap { map_from: String::from("test"), map_to: String::from("test"), ranges: vec![seed_range]};
-    let result = seed_map.get_dest_range((0,15));
-    assert_eq!(expected, result);
-}
+
 #[test]
 fn map_seed_range_from_value () {
 
