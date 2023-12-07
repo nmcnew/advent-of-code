@@ -40,8 +40,8 @@ pub fn part1(input: &String) -> u64 {
 
 pub fn part2(input: &String) -> u64 {
     let sections = input.split("\n\n").collect::<Vec<_>>();
-    let mut map: HashMap<String, SeedMap> = HashMap::new();
     let mut seeds: Vec<(u64, u64)> = Vec::new();
+    let mut plots = Vec::new();
     for i in 0..sections.len() {
         let section = sections[i];
         if i == 0 {
@@ -54,15 +54,14 @@ pub fn part2(input: &String) -> u64 {
                 .map(|c| (c[0], c[1]))
                 .collect::<Vec<_>>();
         } else {
-            let seed_map = SeedMap::from_str(section).unwrap();
-            map.insert(seed_map.map_from.clone(), seed_map);
+            plots.push(SeedMap::from_str(section).unwrap());
         }
     }
+    let super_map = SuperSeedMap::from_vec(plots);
 
     seeds.sort_by(|s1, s2| s1.0.cmp(&s2.0));
     
     //build Vec<Vec<u64>> where the seeds could start at
-
     for i in 0..seeds.len() - 1{
         if i == seeds.len()-1 {
             break;
@@ -74,14 +73,58 @@ pub fn part2(input: &String) -> u64 {
             seed1.1 = seed1.0 + seed2.0 - seed1.0 - 1;
         }
     }
-    println!("{:?}", seeds);
+
+    let mut lowest = u64::MAX;
+    let mut lowest_src = 0;
     for seed in seeds {
-        
+        for i in (seed.0..seed.0+seed.1).step_by(1000) {
+            let loc = super_map.get_location(i);
+            println!("{i} {loc}");
+            if loc < lowest {
+                lowest = loc;
+                lowest_src = i;
+            }
+        }
     }
 
-    return 0;
+    for i in lowest_src..lowest_src+1000 {
+        let loc = super_map.get_location(i);
+        println!("{i} {loc}");
+        if loc < lowest {
+            lowest = loc;
+        }
+    }
+    return lowest;
 }
 
+#[derive(Debug, PartialEq)]
+struct SuperSeedMap {
+    maps: HashMap<String,SeedMap>,
+}
+
+impl SuperSeedMap {
+    fn from_vec(input: Vec<SeedMap>) -> SuperSeedMap {
+        let mut seed_maps = HashMap::new();
+        for map in input {
+            seed_maps.insert(map.map_from.clone(), map);
+        }
+
+        return SuperSeedMap { maps: seed_maps };
+    }
+    fn get_location(&self, s: u64) -> u64 {
+        let mut current_map = self.maps.get("seed").expect("This wasn't mapped right");
+        let mut current_map_from = current_map.map_to.clone();
+        let mut src = s;
+        while current_map_from != "location" {
+            current_map = self.maps
+                .get(&current_map_from)
+                .expect("This wasn't mapped right");
+            current_map_from = current_map.map_to.clone();
+            src = current_map.get_dest(src);
+        }
+        return src;
+    }
+}
 #[derive(Debug, PartialEq)]
 struct SeedMap {
     map_from: String,

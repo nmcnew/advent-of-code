@@ -146,7 +146,11 @@ fn run_day_06(){
     println!("Part 1: {result}, Part 2: {result2}");
 }
 fn run_day_07(){
-    println!("Day 07 is not implented yet");
+    let values = fs::read_to_string("data/day_07.txt")
+        .expect("Day 07 data not initialized");
+    let result = solutions::day_07::part1(&values);
+    let result2 = solutions::day_07::part2(&values);
+    println!("Part 1: {result}, Part 2: {result2}");
 }
 fn run_day_08(){
     println!("Day 08 is not implented yet");
