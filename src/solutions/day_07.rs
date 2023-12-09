@@ -1,11 +1,28 @@
 use std::collections::HashMap;
 
-enum Hands {
-    Five = 8,
-    Four = 7,
-    FullHouse = 6,
-    Three = 5,
-    Two = 4,
+#[derive(Debug, Clone, Copy)]
+enum Card {
+    Ace = 13,
+    King = 12,
+    Queen = 11,
+    Jack = 10,
+    Ten = 9,
+    Nine = 8,
+    Eight = 7,
+    Seven = 6,
+    Six = 5,
+    Five = 4,
+    Four = 3,
+    Three = 2,
+    Two = 1
+}
+
+#[derive(Debug)]
+enum HandKind {
+    FiveOfAKind = 7,
+    FourOfAKind = 6,
+    FullHouse = 5,
+    ThreeOfAKind = 4,
     TwoPair = 3,
     OnePair = 2,
     HighCard = 1,
@@ -20,31 +37,68 @@ pub fn part2(input: &String) -> i32 {
     return 0;
 }
 
-fn compare_hands(hand1: String, hand2: String) -> i32{
+fn compare_hands(hand1: Hand, hand2: Hand) -> i32{
     let mut diff = 0;
-    let hand1_value = get_hand_value(hand1);
-    let hand2_value = get_hand_value(hand2);
-    for i in 0..hand1.len() {
-        diff = compare_card(hand1.chars().nth(i).unwrap(), hand2.chars().nth(i).unwrap());
-        if diff != 0 {
-            break;
-        }
-    }
     return diff;
 }
-fn get_hand_value(hand: &String) -> Hands {
-    let mut cards = HashMap::new();
-    let hand_cards = hand.chars();
-    for card in hand_cards {
-        let count = cards.entry(card).or_insert(0);
-        *count += 1;
-    }
-    return Hands::HighCard;
+
+fn get_card_from_char(c: char) -> Card {
+    let map = HashMap::from([('A', Card::Ace),
+    ('K', Card::King),
+    ('Q', Card::Queen),
+    ('J', Card::Jack),
+    ('T', Card::Ten),
+    ('9', Card::Nine),
+    ('8', Card::Eight),
+    ('7', Card::Seven),
+    ('6', Card::Six),
+    ('5', Card::Five),
+    ('4', Card::Four),
+    ('3', Card::Three),
+    ('2', Card::Two)
+    ]);
+
+    return map.get(&c).expect("Invalid Character provided").clone();
+
+}
+fn get_hand_value(cards: &Vec<Card>) -> HandKind {
+    let map = HashMap::from([(vec![1,1,1,1,1], HandKind::HighCard),
+    (vec![2,1,1,1], HandKind::OnePair),
+    (vec![2,2,1], HandKind::TwoPair),
+    (vec![3,1,1], HandKind::ThreeOfAKind),
+    (vec![3,2], HandKind::FullHouse),
+    (vec![4,1], HandKind::FourOfAKind),
+    (vec![5], HandKind::FiveOfAKind),
+    ]);
+
+
+    return HandKind::HighCard;
 }
 fn compare_card(c1: char, c2: char) -> i32 {
     return 0;
 }
 
+#[derive(Debug)]
+struct Hand {
+    cards: Vec<Card>,
+    hand_type: HandKind
+}
+
+impl Hand {
+
+    fn from_str(input: String) -> Hand {
+
+        let mut cards = Vec::new();
+        for c in input.chars(){
+            cards.push(get_card_from_char(c));
+        }
+        let hand_type = get_hand_value(&cards);
+        Hand {
+            cards: cards,
+            hand_type
+        }
+    }
+}
 #[test]
 fn test_compare_hands() {
 
