@@ -46,12 +46,16 @@ pub fn part1(_input: &String) -> i32 {
     }
     return result;
 }
+
 pub fn part2(_input: &String) -> i32 {
     let mut hand_bets = _input
         .lines()
         .map(|f| {
             let split = f.split(" ").collect::<Vec<_>>();
-            (Hand::from_str_wildcard(split[0]), split[1].parse::<i32>().unwrap())
+            (
+                Hand::from_str_wildcard(split[0]),
+                split[1].parse::<i32>().unwrap(),
+            )
         })
         .collect::<Vec<_>>();
     hand_bets.sort_by(|a, b| a.0.cmp(&b.0));
@@ -101,7 +105,6 @@ fn get_card_from_char_wildcard(c: char) -> Card {
     ]);
 
     return map.get(&c).expect("Invalid Character provided").clone();
-
 }
 fn get_hand_value(cards: &Vec<Card>) -> HandKind {
     let map = HashMap::from([
@@ -154,8 +157,7 @@ fn get_wildcard_hand_value(cards: &Vec<Card>) -> HandKind {
     let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
     if sorted_result.len() == 0 {
         sorted_result.push(5);
-    }
-    else {
+    } else {
         sorted_result.sort();
         sorted_result.reverse();
         sorted_result[0] += wildcards;
@@ -164,17 +166,17 @@ fn get_wildcard_hand_value(cards: &Vec<Card>) -> HandKind {
     return *map_result;
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct Hand {
     cards: Vec<Card>,
     hand_type: HandKind,
 }
-impl PartialEq for Hand {
+
+impl Hand {
     fn eq(&self, other: &Self) -> bool {
         self.cards == other.cards
     }
-}
-impl PartialOrd for Hand {
+
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match self.cards.partial_cmp(&other.cards) {
             Some(core::cmp::Ordering::Equal) => {}
@@ -182,9 +184,7 @@ impl PartialOrd for Hand {
         }
         self.hand_type.partial_cmp(&other.hand_type)
     }
-}
 
-impl Ord for Hand {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         let mut diff: i32 = self.hand_type as i32 - other.hand_type as i32;
         if diff == 0 {
@@ -204,9 +204,7 @@ impl Ord for Hand {
             return std::cmp::Ordering::Equal;
         }
     }
-}
-impl Hand {
-
+    
     fn from_str_wildcard(input: &str) -> Hand {
         let mut cards = Vec::new();
         for c in input.chars() {
