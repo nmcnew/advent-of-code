@@ -108,7 +108,7 @@ enum HandKind {
 }
 
 impl HandKind {
-    fn from_cards(cards: &Vec<Card>) -> HandKind {
+    fn value_from_int_pattern(input: Vec<i32>) -> HandKind {
         let map = HashMap::from([
             (vec![1, 1, 1, 1, 1], HandKind::HighCard),
             (vec![2, 1, 1, 1], HandKind::OnePair),
@@ -119,6 +119,11 @@ impl HandKind {
             (vec![5], HandKind::FiveOfAKind),
         ]);
 
+        return *map
+            .get(&input)
+            .expect("Could not find value from given input");
+    }
+    fn from_cards(cards: &Vec<Card>) -> HandKind {
         let mut card_map = HashMap::new();
 
         for card in cards {
@@ -128,21 +133,11 @@ impl HandKind {
         let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
         sorted_result.sort();
         sorted_result.reverse();
-        let map_result = map.get(&sorted_result).unwrap();
-        return *map_result;
+        let map_result = HandKind::value_from_int_pattern(sorted_result);
+        return map_result;
     }
 
     fn from_cards_wildcard(cards: &Vec<Card>) -> HandKind {
-        let map = HashMap::from([
-            (vec![1, 1, 1, 1, 1], HandKind::HighCard),
-            (vec![2, 1, 1, 1], HandKind::OnePair),
-            (vec![2, 2, 1], HandKind::TwoPair),
-            (vec![3, 1, 1], HandKind::ThreeOfAKind),
-            (vec![3, 2], HandKind::FullHouse),
-            (vec![4, 1], HandKind::FourOfAKind),
-            (vec![5], HandKind::FiveOfAKind),
-        ]);
-
         let mut card_map = HashMap::new();
         let mut wildcards = 0;
         for card in cards {
@@ -164,8 +159,8 @@ impl HandKind {
             sorted_result.reverse();
             sorted_result[0] += wildcards;
         }
-        let map_result = map.get(&sorted_result).unwrap();
-        return *map_result;
+        let map_result = HandKind::value_from_int_pattern(sorted_result);
+        return map_result;
     }
 }
 
