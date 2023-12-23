@@ -1,5 +1,42 @@
 use std::collections::HashMap;
 
+pub fn part1(_input: &String) -> i32 {
+    let hand_bets = _input
+        .lines()
+        .map(|f| {
+            let split = f.split(" ").collect::<Vec<_>>();
+            (Hand::from_str(split[0]), split[1].parse::<i32>().unwrap())
+        })
+        .collect::<Vec<_>>();
+    let result = get_result(hand_bets);
+    return result;
+}
+
+pub fn part2(_input: &String) -> i32 {
+    let hand_bets = _input
+        .lines()
+        .map(|f| {
+            let split = f.split(" ").collect::<Vec<_>>();
+            (
+                Hand::from_str_wildcard(split[0]),
+                split[1].parse::<i32>().unwrap(),
+            )
+        })
+        .collect::<Vec<_>>();
+    return get_result(hand_bets);
+}
+
+fn get_result(mut hand_bets: Vec<(Hand, i32)>) -> i32 {
+    hand_bets.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut result = 0;
+    for i in 0..hand_bets.len() {
+        let hand_bet = &hand_bets[i];
+        let rank: i32 = i as i32 + 1;
+        result += hand_bet.1 * rank;
+    }
+    return result;
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Card {
     Ace = 13,
@@ -18,6 +55,47 @@ enum Card {
     Joker = 0,
 }
 
+impl Card {
+    fn from_char(c: char) -> Card {
+        let map = HashMap::from([
+            ('A', Card::Ace),
+            ('K', Card::King),
+            ('Q', Card::Queen),
+            ('J', Card::Jack),
+            ('T', Card::Ten),
+            ('9', Card::Nine),
+            ('8', Card::Eight),
+            ('7', Card::Seven),
+            ('6', Card::Six),
+            ('5', Card::Five),
+            ('4', Card::Four),
+            ('3', Card::Three),
+            ('2', Card::Two),
+        ]);
+
+        return map.get(&c).expect("Invalid Character provided").clone();
+    }
+    fn from_char_wildcard(c: char) -> Card {
+        let map = HashMap::from([
+            ('A', Card::Ace),
+            ('K', Card::King),
+            ('Q', Card::Queen),
+            ('J', Card::Joker),
+            ('T', Card::Ten),
+            ('9', Card::Nine),
+            ('8', Card::Eight),
+            ('7', Card::Seven),
+            ('6', Card::Six),
+            ('5', Card::Five),
+            ('4', Card::Four),
+            ('3', Card::Three),
+            ('2', Card::Two),
+        ]);
+
+        return map.get(&c).expect("Invalid Character provided").clone();
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum HandKind {
     FiveOfAKind = 7,
@@ -29,141 +107,66 @@ enum HandKind {
     HighCard = 1,
 }
 
-pub fn part1(_input: &String) -> i32 {
-    let mut hand_bets = _input
-        .lines()
-        .map(|f| {
-            let split = f.split(" ").collect::<Vec<_>>();
-            (Hand::from_str(split[0]), split[1].parse::<i32>().unwrap())
-        })
-        .collect::<Vec<_>>();
-    hand_bets.sort_by(|a, b| a.0.cmp(&b.0));
-    let mut result = 0;
-    for i in 0..hand_bets.len() {
-        let hand_bet = &hand_bets[i];
-        let rank: i32 = i as i32 + 1;
-        result += hand_bet.1 * rank;
-    }
-    return result;
-}
+impl HandKind {
+    fn from_cards(cards: &Vec<Card>) -> HandKind {
+        let map = HashMap::from([
+            (vec![1, 1, 1, 1, 1], HandKind::HighCard),
+            (vec![2, 1, 1, 1], HandKind::OnePair),
+            (vec![2, 2, 1], HandKind::TwoPair),
+            (vec![3, 1, 1], HandKind::ThreeOfAKind),
+            (vec![3, 2], HandKind::FullHouse),
+            (vec![4, 1], HandKind::FourOfAKind),
+            (vec![5], HandKind::FiveOfAKind),
+        ]);
 
-pub fn part2(_input: &String) -> i32 {
-    let mut hand_bets = _input
-        .lines()
-        .map(|f| {
-            let split = f.split(" ").collect::<Vec<_>>();
-            (
-                Hand::from_str_wildcard(split[0]),
-                split[1].parse::<i32>().unwrap(),
-            )
-        })
-        .collect::<Vec<_>>();
-    hand_bets.sort_by(|a, b| a.0.cmp(&b.0));
-    let mut result = 0;
-    for i in 0..hand_bets.len() {
-        let hand_bet = &hand_bets[i];
-        let rank: i32 = i as i32 + 1;
-        result += hand_bet.1 * rank;
-    }
-    return result;
-}
+        let mut card_map = HashMap::new();
 
-fn get_card_from_char(c: char) -> Card {
-    let map = HashMap::from([
-        ('A', Card::Ace),
-        ('K', Card::King),
-        ('Q', Card::Queen),
-        ('J', Card::Jack),
-        ('T', Card::Ten),
-        ('9', Card::Nine),
-        ('8', Card::Eight),
-        ('7', Card::Seven),
-        ('6', Card::Six),
-        ('5', Card::Five),
-        ('4', Card::Four),
-        ('3', Card::Three),
-        ('2', Card::Two),
-    ]);
-
-    return map.get(&c).expect("Invalid Character provided").clone();
-}
-fn get_card_from_char_wildcard(c: char) -> Card {
-    let map = HashMap::from([
-        ('A', Card::Ace),
-        ('K', Card::King),
-        ('Q', Card::Queen),
-        ('J', Card::Joker),
-        ('T', Card::Ten),
-        ('9', Card::Nine),
-        ('8', Card::Eight),
-        ('7', Card::Seven),
-        ('6', Card::Six),
-        ('5', Card::Five),
-        ('4', Card::Four),
-        ('3', Card::Three),
-        ('2', Card::Two),
-    ]);
-
-    return map.get(&c).expect("Invalid Character provided").clone();
-}
-fn get_hand_value(cards: &Vec<Card>) -> HandKind {
-    let map = HashMap::from([
-        (vec![1, 1, 1, 1, 1], HandKind::HighCard),
-        (vec![2, 1, 1, 1], HandKind::OnePair),
-        (vec![2, 2, 1], HandKind::TwoPair),
-        (vec![3, 1, 1], HandKind::ThreeOfAKind),
-        (vec![3, 2], HandKind::FullHouse),
-        (vec![4, 1], HandKind::FourOfAKind),
-        (vec![5], HandKind::FiveOfAKind),
-    ]);
-
-    let mut card_map = HashMap::new();
-
-    for card in cards {
-        let card_val = card_map.entry(card).or_insert(0);
-        *card_val += 1;
-    }
-    let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
-    sorted_result.sort();
-    sorted_result.reverse();
-    let map_result = map.get(&sorted_result).unwrap();
-    return *map_result;
-}
-
-fn get_wildcard_hand_value(cards: &Vec<Card>) -> HandKind {
-    let map = HashMap::from([
-        (vec![1, 1, 1, 1, 1], HandKind::HighCard),
-        (vec![2, 1, 1, 1], HandKind::OnePair),
-        (vec![2, 2, 1], HandKind::TwoPair),
-        (vec![3, 1, 1], HandKind::ThreeOfAKind),
-        (vec![3, 2], HandKind::FullHouse),
-        (vec![4, 1], HandKind::FourOfAKind),
-        (vec![5], HandKind::FiveOfAKind),
-    ]);
-
-    let mut card_map = HashMap::new();
-    let mut wildcards = 0;
-    for card in cards {
-        match card {
-            Card::Joker => {
-                wildcards += 1;
-            }
-            _ => {
-                let card_val = card_map.entry(card).or_insert(0);
-                *card_val += 1;
-            }
+        for card in cards {
+            let card_val = card_map.entry(card).or_insert(0);
+            *card_val += 1;
         }
-    }
-    let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
-    if sorted_result.len() == 0 {
-        sorted_result.push(5);
-    } else {
+        let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
         sorted_result.sort();
         sorted_result.reverse();
-        sorted_result[0] += wildcards;
+        let map_result = map.get(&sorted_result).unwrap();
+        return *map_result;
     }
-    let map_result = map.get(&sorted_result).unwrap();
-    return *map_result;
+
+    fn from_cards_wildcard(cards: &Vec<Card>) -> HandKind {
+        let map = HashMap::from([
+            (vec![1, 1, 1, 1, 1], HandKind::HighCard),
+            (vec![2, 1, 1, 1], HandKind::OnePair),
+            (vec![2, 2, 1], HandKind::TwoPair),
+            (vec![3, 1, 1], HandKind::ThreeOfAKind),
+            (vec![3, 2], HandKind::FullHouse),
+            (vec![4, 1], HandKind::FourOfAKind),
+            (vec![5], HandKind::FiveOfAKind),
+        ]);
+
+        let mut card_map = HashMap::new();
+        let mut wildcards = 0;
+        for card in cards {
+            match card {
+                Card::Joker => {
+                    wildcards += 1;
+                }
+                _ => {
+                    let card_val = card_map.entry(card).or_insert(0);
+                    *card_val += 1;
+                }
+            }
+        }
+        let mut sorted_result: Vec<i32> = card_map.values().map(|f| *f).collect();
+        if sorted_result.len() == 0 {
+            sorted_result.push(5);
+        } else {
+            sorted_result.sort();
+            sorted_result.reverse();
+            sorted_result[0] += wildcards;
+        }
+        let map_result = map.get(&sorted_result).unwrap();
+        return *map_result;
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -173,18 +176,6 @@ struct Hand {
 }
 
 impl Hand {
-    fn eq(&self, other: &Self) -> bool {
-        self.cards == other.cards
-    }
-
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match self.cards.partial_cmp(&other.cards) {
-            Some(core::cmp::Ordering::Equal) => {}
-            ord => return ord,
-        }
-        self.hand_type.partial_cmp(&other.hand_type)
-    }
-
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         let mut diff: i32 = self.hand_type as i32 - other.hand_type as i32;
         if diff == 0 {
@@ -204,13 +195,13 @@ impl Hand {
             return std::cmp::Ordering::Equal;
         }
     }
-    
+
     fn from_str_wildcard(input: &str) -> Hand {
         let mut cards = Vec::new();
         for c in input.chars() {
-            cards.push(get_card_from_char_wildcard(c));
+            cards.push(Card::from_char_wildcard(c));
         }
-        let hand_type = get_wildcard_hand_value(&cards);
+        let hand_type = HandKind::from_cards_wildcard(&cards);
         Hand {
             cards: cards,
             hand_type,
@@ -220,9 +211,9 @@ impl Hand {
     fn from_str(input: &str) -> Hand {
         let mut cards = Vec::new();
         for c in input.chars() {
-            cards.push(get_card_from_char(c));
+            cards.push(Card::from_char(c));
         }
-        let hand_type = get_hand_value(&cards);
+        let hand_type = HandKind::from_cards(&cards);
         Hand {
             cards: cards,
             hand_type,
