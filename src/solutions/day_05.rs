@@ -60,16 +60,16 @@ pub fn part2(input: &String) -> u64 {
     let super_map = SuperSeedMap::from_vec(plots);
 
     seeds.sort_by(|s1, s2| s1.0.cmp(&s2.0));
-    
+
     //build Vec<Vec<u64>> where the seeds could start at
-    for i in 0..seeds.len() - 1{
-        if i == seeds.len()-1 {
+    for i in 0..seeds.len() - 1 {
+        if i == seeds.len() - 1 {
             break;
         }
         let mut seed1 = seeds[i];
-        let seed2 = seeds[i+1];
+        let seed2 = seeds[i + 1];
 
-        if seed1.0+seed1.1 > seed2.0 {
+        if seed1.0 + seed1.1 > seed2.0 {
             seed1.1 = seed1.0 + seed2.0 - seed1.0 - 1;
         }
     }
@@ -77,7 +77,7 @@ pub fn part2(input: &String) -> u64 {
     let mut lowest = u64::MAX;
     let mut lowest_src = 0;
     for seed in seeds {
-        for i in (seed.0..seed.0+seed.1).step_by(1000) {
+        for i in (seed.0..seed.0 + seed.1).step_by(1000) {
             let loc = super_map.get_location(i);
             println!("{i} {loc}");
             if loc < lowest {
@@ -87,7 +87,7 @@ pub fn part2(input: &String) -> u64 {
         }
     }
 
-    for i in lowest_src..lowest_src+1000 {
+    for i in lowest_src..lowest_src + 1000 {
         let loc = super_map.get_location(i);
         println!("{i} {loc}");
         if loc < lowest {
@@ -99,7 +99,7 @@ pub fn part2(input: &String) -> u64 {
 
 #[derive(Debug, PartialEq)]
 struct SuperSeedMap {
-    maps: HashMap<String,SeedMap>,
+    maps: HashMap<String, SeedMap>,
 }
 
 impl SuperSeedMap {
@@ -116,7 +116,8 @@ impl SuperSeedMap {
         let mut current_map_from = current_map.map_to.clone();
         let mut src = s;
         while current_map_from != "location" {
-            current_map = self.maps
+            current_map = self
+                .maps
                 .get(&current_map_from)
                 .expect("This wasn't mapped right");
             current_map_from = current_map.map_to.clone();
@@ -135,14 +136,20 @@ struct SeedMap {
 #[derive(Debug, PartialEq)]
 struct SeedRange {
     source: Range<u64>,
-    destination: Range<u64>
+    destination: Range<u64>,
 }
 
 impl SeedRange {
     fn new(src: u64, dest: u64, length: u64) -> SeedRange {
         return SeedRange {
-            source: Range { start: src, end: src+length },
-            destination: Range { start: dest, end: dest+length },
+            source: Range {
+                start: src,
+                end: src + length,
+            },
+            destination: Range {
+                start: dest,
+                end: dest + length,
+            },
         };
     }
 }
@@ -200,7 +207,10 @@ impl FromStr for SeedMap {
                 );
             }
         }
-        let mut ranges = gens.iter().map(|g| SeedRange::new( g[1], g[0], g[2])).collect::<Vec<_>>();
+        let ranges = gens
+            .iter()
+            .map(|g| SeedRange::new(g[1], g[0], g[2]))
+            .collect::<Vec<_>>();
         Ok(SeedMap {
             map_from: map_from.to_string(),
             map_to: map_to.to_string(),
@@ -210,13 +220,12 @@ impl FromStr for SeedMap {
 }
 
 #[test]
-fn map_seed_range_from_value () {
-
-    let result = SeedRange::new(0,5,5);
-    let expected_source_range = Range { start: 0, end: 5};
-    let expected_dest_range = Range { start: 5, end: 10};
-    assert_eq!( expected_source_range, result.source);
-    assert_eq!( expected_dest_range, result.destination);
+fn map_seed_range_from_value() {
+    let result = SeedRange::new(0, 5, 5);
+    let expected_source_range = Range { start: 0, end: 5 };
+    let expected_dest_range = Range { start: 5, end: 10 };
+    assert_eq!(expected_source_range, result.source);
+    assert_eq!(expected_dest_range, result.destination);
 }
 #[test]
 fn map_from_str() {
@@ -230,7 +239,11 @@ fn map_from_str() {
     let expected = SeedMap {
         map_from: String::from("soil"),
         map_to: String::from("fertilizer"),
-        ranges: vec![SeedRange::new(15, 0, 37), SeedRange::new(52, 37, 2), SeedRange::new(0, 39, 15)],
+        ranges: vec![
+            SeedRange::new(15, 0, 37),
+            SeedRange::new(52, 37, 2),
+            SeedRange::new(0, 39, 15),
+        ],
     };
     let result = SeedMap::from_str(&string).unwrap();
     assert_eq!(expected, result);
@@ -240,7 +253,11 @@ fn get_seed_dest() {
     let map = SeedMap {
         map_from: String::from("soil"),
         map_to: String::from("fertilizer"),
-        ranges: vec![SeedRange::new(15, 0, 37), SeedRange::new(52, 37, 2), SeedRange::new(0, 39, 15)],
+        ranges: vec![
+            SeedRange::new(15, 0, 37),
+            SeedRange::new(52, 37, 2),
+            SeedRange::new(0, 39, 15),
+        ],
     };
     let result = map.get_dest(16);
     assert_eq!(1, result);

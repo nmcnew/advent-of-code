@@ -1,9 +1,20 @@
 use std::collections::HashMap;
 pub fn part1(input: &String) -> i32 {
     // Part 1
-    let part1: i32 = input.lines()
+    let part1: i32 = input
+        .lines()
         .map(|line| line.chars().filter(|c| c.is_digit(10)).collect::<String>())
-        .map(|number_string| [number_string.chars().nth(0).unwrap(),number_string.chars().nth(number_string.chars().count()-1).unwrap()].iter().collect::<String>())
+        .map(|number_string| {
+            [
+                number_string.chars().nth(0).unwrap(),
+                number_string
+                    .chars()
+                    .nth(number_string.chars().count() - 1)
+                    .unwrap(),
+            ]
+            .iter()
+            .collect::<String>()
+        })
         .map(|config_number| config_number.parse::<i32>().unwrap())
         .sum();
     return part1;
@@ -19,23 +30,26 @@ pub fn part2(input: &String) -> i32 {
         ("six", '6'),
         ("seven", '7'),
         ("eight", '8'),
-        ("nine", '9')
+        ("nine", '9'),
     ]);
-    let part2 = input.lines()
+    let part2 = input
+        .lines()
         .map(|line| {
-            let char_enum = line.chars()
-                .enumerate();
+            let char_enum = line.chars().enumerate();
             let mut result = String::from("");
             for (i, c) in char_enum {
-                let hash_value = number_map.iter().filter(|num| {
-                    let end = i + num.0.len();
-                    if end > line.len() {
+                let hash_value = number_map
+                    .iter()
+                    .filter(|num| {
+                        let end = i + num.0.len();
+                        if end > line.len() {
+                            return false;
+                        } else if &line[i..end] == *num.0 {
+                            return true;
+                        }
                         return false;
-                    } else if &line[i..end] == *num.0 {
-                        return true;
-                    }
-                    return false;
-                }).nth(0);
+                    })
+                    .nth(0);
                 if c.is_digit(10) {
                     result.push(c);
                 } else if hash_value.is_some() {
@@ -44,7 +58,17 @@ pub fn part2(input: &String) -> i32 {
             }
             return result;
         })
-        .map(|number_string| [number_string.chars().nth(0).unwrap(),number_string.chars().nth(number_string.chars().count()-1).unwrap()].iter().collect::<String>())
+        .map(|number_string| {
+            [
+                number_string.chars().nth(0).unwrap(),
+                number_string
+                    .chars()
+                    .nth(number_string.chars().count() - 1)
+                    .unwrap(),
+            ]
+            .iter()
+            .collect::<String>()
+        })
         .map(|config_number| config_number.parse::<i32>().unwrap())
         .sum();
     return part2;
