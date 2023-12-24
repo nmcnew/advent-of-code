@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn part1(_input: &String) -> i32 {
+pub fn part1(_input: &str) -> i32 {
     let hand_bets = _input
         .lines()
         .map(|f| {
@@ -12,7 +12,7 @@ pub fn part1(_input: &String) -> i32 {
     return result;
 }
 
-pub fn part2(_input: &String) -> i32 {
+pub fn part2(_input: &str) -> i32 {
     let hand_bets = _input
         .lines()
         .map(|f| {
